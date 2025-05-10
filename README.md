@@ -7,3 +7,6 @@ Noslēguma darba uzdevums ir izveidot
 ## Šajā projektā tika izmantotas sēkojošas Python bibliotēkas:
 - BeautifulSoup
 - requests 
+- time
+- urllib.parse
+- os
