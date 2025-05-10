@@ -13,8 +13,13 @@ if html_page.status_code == 200:
         company = vacancies.find('li', class_ = 'company')
         if company:
             company_name = company.text.strip()
-            print(company_name)
+            speciality = vacancies.find('div', class_='title').find('a').text.strip()
+            print(f'Company Name: {company_name}\nSpeciality: {speciality}\n')
+            
         else:
             print("Comapny not found")
     else:
         print("Vacancy not found")
+
+
+        
