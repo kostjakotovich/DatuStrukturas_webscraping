@@ -29,7 +29,7 @@ def build_url(speciality, location, keywords,  page_number):
     if keywords:
         url += f"?keywords={quote(keywords.strip())}"
     if page_number > 1:
-        url += f"?page={page_number}"
+        url += f"&page={page_number}"
     url += "#results"
     return url
 
@@ -71,7 +71,7 @@ def find_vacancies(page_number):
 
     if html_page.status_code == 200:
         page_content = BeautifulSoup(html_page.text, "html.parser")
-        print(f"\n🔍 Searching: {search_url}\n")
+        print(f"\n🔍 {page_number}. Searching: {search_url}\n")
         vacancies = page_content.find_all('div', class_ = ['item', 'item big-item'])
 
         new_vacancy_found = False
@@ -104,11 +104,19 @@ def find_vacancies(page_number):
 
                 if company:
                     vacancy_title = title.find('a').text.strip()
-                    experience = personal_filters.get("experience_level", "")
-                    if not experience or experience.lower() in vacancy_title.lower():
+                    experience = personal_filters.get("experience_level", "").lower()
+                    level_keywords = levels.get(experience, [experience]) if experience else []
+
+                    if not level_keywords or any(keyword in vacancy_title.lower() for keyword in level_keywords):
                         company_name = company.text.strip()
 
-                        print(f"Company Name: {company_name}\nVacancy Title: {vacancy_title}")
+                        salary_title = vacancy.find('li', class_='salary')
+                        if salary_title:
+                            salary = salary_title.text.strip() 
+                        else: 
+                            salary = "not mentioned"
+
+                        print(f"Company Name: {company_name}\nVacancy Title: {vacancy_title}\nSalary: {salary} euro")
                         print(f"Link to vacancy: {vacancy_full_link}\n")
 
                 new_vacancy_found = True
