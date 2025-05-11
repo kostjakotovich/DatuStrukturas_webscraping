@@ -64,6 +64,67 @@ def set_personal_filters():
     personal_filters["experience_level"] = experience_level
     return personal_filters
 
+def extract_salary_value(salary_str):
+    salary_str = salary_str.lower()
+    salary_str = salary_str.replace("(bruto)", "")
+    salary_str = salary_str.replace("(neto)", "")
+    salary_str = salary_str.replace("no", "").strip()
+
+    if ' - ' in salary_str:
+        parts = salary_str.split(' - ')
+        try:
+            lower = int(parts[0].strip())
+            upper = int(parts[1].strip())
+            return (lower + upper) / 2
+        except ValueError:
+            return 0
+
+    parts = salary_str.split()
+    for part in parts:
+        if part.isdigit():
+            return int(part)
+
+    return 0
+
+    
+def merge_sort(my_list): # merge sort O(nlogn)
+    if len(my_list) <= 1:
+        return my_list
+
+    mid_index = len(my_list) // 2  # sadalam sarakstu uz divam pusem
+    left = merge_sort(my_list[:mid_index])  # rekursija, kartojam kreiso pusi
+    right = merge_sort(my_list[mid_index:])  # rekursija, kartojam labo pusi
+
+    return merge(left, right)
+
+def merge(list1, list2):
+    combined = [] 
+    i = 0 
+    j = 0 
+
+    # kamer abi saraksti nebeidzas
+    while i < len(list1) and j < len(list2):
+        if extract_salary_value(list1[i]['salary']) < extract_salary_value(list2[j]['salary']):
+            combined.append(list1[i])  # pievienoja saraksta mazako vertibu
+            i += 1 
+        else:
+            combined.append(list2[j])  
+            j += 1 
+
+    # ja palika elementi pirmaja saraksta
+    while i < len(list1):
+        combined.append(list1[i])
+        i += 1
+
+    # ja palika elementi otraja saraksta
+    while j < len(list2):
+        combined.append(list2[j])
+        j += 1
+
+    return combined
+
+
+
 def find_vacancies(page_number):
     search_url = build_url(
         website_filters.get("speciality"),
@@ -144,9 +205,10 @@ if __name__ == "__main__":
         menu_number = input("Menu (write the corresponding number of the command you want to execute):\n"
                             "1) Change job parameters\n"
                             "2) Find\n"
-                            "3) Clear screen (clears everything until the last output)"
-                            "\n4) Show saved vacancies\n"
-                            "5) Exit \n")
+                            "3) Clear screen (clears everything until the last output)\n"
+                            "4) Show saved vacancies\n"
+                            "5) Show saved vacancies sorted by salary\n"
+                            "6) Exit \n")
 
         match menu_number:
             case "1":
@@ -183,7 +245,14 @@ if __name__ == "__main__":
                     for vacancy in all_vacances:
                         print(f"Company: {vacancy['company']}\nTitle: {vacancy['title']}\nSalary: {vacancy['salary']}\nLink: {vacancy['link']}\n")
             case "5":
-                break
+                if not all_vacances:
+                    print("No saved vacancies.")
+                else:
+                    sorted_vacancies = merge_sort(all_vacances)
+                    
+                    for vacancy in sorted_vacancies:
+                        print(f"Company: {vacancy['company']}\nTitle: {vacancy['title']}\nSalary: {vacancy['salary']}\nLink: {vacancy['link']}\n")
+                    
             case "6":
                 break
             case _: 
