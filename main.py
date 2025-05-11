@@ -24,12 +24,17 @@ def build_url(speciality, location, keywords,  page_number):
     if speciality:
         url += f"kas:{quote(speciality.strip())}/"
     if location:
-        url += f"kur:{quote(location.strip())}/"
-    url = url.rstrip('/')
+        url += f"kur:{quote(location.strip())}"
+
+    query_params = []
     if keywords:
-        url += f"?keywords={quote(keywords.strip())}"
+        query_params.append(f"keywords={quote(keywords.strip())}")
     if page_number > 1:
-        url += f"&page={page_number}"
+        query_params.append(f"page={page_number}")
+
+    if query_params:
+        url += "?" + "&".join(query_params)
+
     url += "#results"
     return url
 
@@ -119,6 +124,14 @@ def find_vacancies(page_number):
                         print(f"Company Name: {company_name}\nVacancy Title: {vacancy_title}\nSalary: {salary} euro")
                         print(f"Link to vacancy: {vacancy_full_link}\n")
 
+                        all_vacances.append({
+                            'company': company_name,
+                            'title': vacancy_title,
+                            'salary': salary,
+                            'link': vacancy_full_link
+                        })
+
+
                 new_vacancy_found = True
 
 
@@ -128,20 +141,19 @@ if __name__ == "__main__":
     set_website_filters()
     set_personal_filters()
     while True:
-        page_number = 1
-        seen_links.clear()
-        while True:
-            has_next_page = find_vacancies(page_number)
-            if has_next_page:
-                page_number += 1  # uz nakamo lapu
-            else:
-                break
+        menu_number = input("Menu (write the corresponding number of the command you want to execute):\n"
+                            "1) Change job parameters\n"
+                            "2) Find\n"
+                            "3) Clear screen (clears everything until the last output)"
+                            "\n4) Show saved vacancies\n"
+                            "5) Exit \n")
 
-        menu_number = input("Menu (write the corresponding number of the command you want to execute):\n1) Change job parameters\n2) Refresh all vacancies\n3) Clear screen (clears everything until the last output)\n4) Exit \n")
         match menu_number:
             case "1":
                 set_website_filters()
                 set_personal_filters()
+                all_vacances.clear()
+                seen_links.clear()
                 page_number = 1
                 while True:
                     has_next_page = find_vacancies(page_number)
@@ -151,11 +163,28 @@ if __name__ == "__main__":
                         break
             case "2":
                 wait_time = 2
+                all_vacances.clear()
+                seen_links.clear()
                 print(f"Waiting {wait_time} seconds for vacancies refreshing...\n")
                 time.sleep(wait_time)
+                page_number = 1
+                while True:
+                    has_next_page = find_vacancies(page_number)
+                    if has_next_page:
+                        page_number += 1
+                    else:
+                        break
             case "3":
                 os.system('cls' if os.name == 'nt' else 'clear')
             case "4":
+                if not all_vacances:
+                    print("No saved vacancies.")
+                else:
+                    for vacancy in all_vacances:
+                        print(f"Company: {vacancy['company']}\nTitle: {vacancy['title']}\nSalary: {vacancy['salary']}\nLink: {vacancy['link']}\n")
+            case "5":
+                break
+            case "6":
                 break
             case _: 
                 print("Unknown command, please type 1 or 2")
