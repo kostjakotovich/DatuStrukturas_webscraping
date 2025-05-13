@@ -29,6 +29,10 @@ Programmas izstrādei tiek izmantots Visual Studio kods (1.100) un Python progra
 - urllib.parse - tiek izmantots URL kodēšanai, lai tīmekļa adresēs droši iekļautu meklēšanas parametrus. Šajā projektā tas tiek izmantots, lai apkopotu URL, pamatojoties uz vietnes iekšējiem parametriem.
 - os - operētājsistēmas operācijām, piemēram, console clear atkarībā no operētājsistēmas (cls operētājsistēmai Windows, clear operētājsistēmai Unix).
 
+- Bibliotēku instalēšanai:
+pip install requests
+pip install beautifulsoup4
+
 ## Izmanotās datu struktūras:
 
 Projektā izmantotās datu struktūras:
